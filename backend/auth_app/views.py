@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-# from .models import CustomUser as 
+from .models import *
 User = get_user_model()
 
 # ✅ Test endpoint
@@ -12,38 +12,13 @@ User = get_user_model()
 def getData(request):
     return Response({'name': 'React + Django Connected!', 'status': 'success'})
 
-# ✅ Signup
-@api_view(['POST'])
-def signup(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    role = request.data.get('role')
-    email = request.data.get('email')
-
-    if not all([username, password,role, email]):
-        return Response({'error': 'Missing fields'}, status=400)
-
-    if User.objects.filter(username=username).exists():
-        return Response({'error': 'User already exists'}, status=400)
-
-    # You can add allowed roles check here
-    user = User.objects.create_user(username=username,password=password, role=role, email=email)
-
-    return Response(
-        {'message': 'User created successfully', 'username': user.username, 'role':role},
-        status=201
-    )
-
-
 # ✅ Login
 @api_view(['POST'])
 def loginUser(request): 
     username = request.data.get('username')
     password = request.data.get('password')
-    role = request.data.get('role')
-
+    role = request.data.get('role') 
     print(request.data)
-
     user = authenticate(username=username, password=password,role=role)
     if user is not None:
 
@@ -77,6 +52,71 @@ def getUserData(request):
     user = request.user
     return Response({'username': user.username, 'email': user.email, "role":user.role})
 
+
+# ✅ Signup
+@api_view(['POST'])
+def signup(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    role = request.data.get('role')
+    email = request.data.get('email')
+
+    print(username,password,role,email)
+
+    if not all([username,password,role,email]):
+        return Response({'error':'field value missig '}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if role == "owner":
+        try:
+            if User.objects.filter(username=username).exists():
+                return Response({"message":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
+            if User.objects.filter(email=email).exists():
+                return Response({"message":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+            user = User.objects.create_user(username=username,password=password, email=email, role=role)
+            user.save()
+            if user:
+                return Response({"message":f"user {user.username} successfully created!"}, status=status.HTTP_201_CREATED)
+                
+        except Exception as e:
+            print(f'{e}')
+            return Response({'error':"Internal problem "}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+   
+    else:
+        try:
+            authenticated = request.user.is_authenticated
+            member_name =username
+            if not authenticated:
+                return Response({'error':'Only logged in owner can add staff (create owner account first)!'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if authenticated:
+                user_id = request.user.id
+                print(user_id)
+                restaurant = Restaurant.objects.filter(user=request.user ).first()
+                if not restaurant:
+                    return Response({'error':'create your restaurant (get id) after that you can add staff member'}, status=status.HTTP_404_NOT_FOUND)
+                
+                if User.objects.filter(username=username).exists():
+                    return Response({"message":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
+                if User.objects.filter(email=email).exists():
+                    return Response({"message":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
+                
+                user_as_staff = User.objects.create_user(username=username,password=password, email=email, role=role)
+                user_as_staff.save()
+     
+                staff = StaffMember.objects.create(owner = restaurant.user , restaurant = restaurant,member_name=member_name, member_id = user_as_staff)
+                staff.save()
+
+                return Response({'message': f'Staff account can be created for {restaurant.restaurant_name}'}, status=status.HTTP_200_OK)
+            
+            else:
+                print(f'else {request.user}')
+                return Response({'error': 'Unexpected authentication state'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            user_as_staff.delete()
+            print(f"{e}")
+            return Response({'error': "internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # ✅ Token refresh
 @api_view(['POST'])

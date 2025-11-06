@@ -18,9 +18,10 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# Application definition
+# Application definition 
 
 INSTALLED_APPS = [
+    'auth_app.apps.AuthAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,7 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'auth_app',
+    # 'auth_app',
 ]
 
 MIDDLEWARE = [
