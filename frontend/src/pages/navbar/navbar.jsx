@@ -1,51 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-  FiMenu,
-  FiX,
-  FiLogOut,
-  FiLogIn,
-  FiSettings,
-  FiBriefcase,
-  FiHome,
-  FiFileText,
-  FiClipboard,
-  FiUsers,
-  FiGrid,
-  FiBookOpen,
-  FiHelpCircle,
-  FiList,
-} from "react-icons/fi";
 import { apiGet } from "../../utils/api";
 
-// ✅ Role-based navigation (cleaned + meaningful icons)
 const navItems = {
   admin: [
-    { name: "Dashboard", path: "/admin/dashboard", icon: FiGrid },
-    { name: "Restaurants", path: "/admin/restaurants", icon: FiUsers },
-    { name: "Subscriptions", path: "/admin/subscriptions", icon: FiClipboard },
-    { name: "Reports", path: "/admin/reports", icon: FiFileText },
+    { name: "Dashboard", path: "/admin/dashboard" },
+    { name: "Restaurants", path: "/admin/restaurants" },
+    { name: "Subscriptions", path: "/admin/subscriptions" },
+    { name: "Reports", path: "/admin/reports" },
+    { name: "Active Restaurants", path: "/admin/active-restaurents" },
+    { name: "All Users", path: "/admin/all-user" },
+    { name: "Daily Connection", path: "/admin/daily-connection" },
   ],
   owner: [
-    { name: "Dashboard", path: "/restaurant/dashboard", icon: FiGrid },
-    { name: "Menu", path: "/restaurant/menu", icon: FiList },
-    { name: "Tables & QR", path: "/restaurant/tables", icon: FiBookOpen },
-    { name: "Orders", path: "/restaurant/orders", icon: FiBriefcase },
-    { name: "Reports", path: "/restaurant/reports", icon: FiFileText },
+    { name: "Dashboard", path: "/restaurant/dashboard" },
+    { name: "Menu", path: "/restaurant/menu" },
+    { name: "Tables & QR", path: "/restaurant/tables" },
+    { name: "Orders", path: "/restaurant/orders" },
+    { name: "Reports", path: "/restaurant/reports" },
+    { name: "Settings", path: "/restaurant/settings" },
+    { name: "Term & cuddition", path: "/restaurant/term-coddintion" },
   ],
   staff: [
-    { name: "Kitchen Dashboard", path: "/staff/kitchen", icon: FiHome },
-    { name: "Order History", path: "/staff/orders", icon: FiList },
+    { name: "Kitchen Dashboard", path: "/staff/kitchen" },
+    { name: "Order History", path: "/staff/orders" },
   ],
   tour_user: [
-    { name: "Home", path: "/", icon: FiHome },
-    { name: "About", path: "/tour_about", icon: FiBookOpen },
-    { name: "Support", path: "/Support", icon: FiHelpCircle },
+    { name: "Home", path: "/" },
+    { name: "About", path: "/tour_about" },
+    { name: "Support", path: "/Support" },
   ],
 };
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,7 +47,7 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    setIsMenuOpen(false);
+    setIsMobileOpen(false);
   }, [location]);
 
   const handleLogout = async () => {
@@ -73,111 +61,112 @@ const Navbar = () => {
     }
   };
 
+  const handleLogin = () => navigate("/auth/login");
   const role = user?.role?.toLowerCase() || "tour_user";
-  const links = navItems[role] || [];
+  const navLinks = navItems[role] || [];
 
   return (
-    <nav className="bg-white/80 backdrop-blur-xl shadow-md sticky top-0 z-50 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Brand */}
-          <Link to={links[0]?.path || "/"} className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-indigo-600 tracking-tight">
-              {role === "admin" ? "Admin Panel" : "My Restaurant SaaS"}
-            </span>
-          </Link>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-6">
-            {links.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`flex items-center text-sm font-medium px-3 py-2 rounded-md transition-all ${
-                  location.pathname === item.path
-                    ? "text-indigo-600 bg-indigo-50"
-                    : "text-gray-700 hover:text-indigo-600 hover:bg-indigo-50"
-                }`}
-              >
-                <item.icon className="w-4 h-4 mr-2" /> {item.name}
-              </Link>
-            ))}
-
-            {user ? (
-              <>
-                <span className="text-gray-600 text-sm">
-                  👋 {user.username} ({role})
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition-all duration-200"
-                >
-                  <FiLogOut className="w-5 h-5 mr-1" /> Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/auth/login"
-                className="flex items-center bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transition-all duration-200"
-              >
-                <FiLogIn className="w-5 h-5 mr-1" /> Login / Signup
-              </Link>
-            )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-indigo-600 focus:outline-none transition-transform duration-300"
-            >
-              {isMenuOpen ? <FiX className="w-7 h-7" /> : <FiMenu className="w-7 h-7" />}
-            </button>
-          </div>
+    <header className="fixed top-0 w-full z-50 backdrop-blur-md bg-gradient-to-r from-[#0f0c29] via-[#302b63] to-[#24243e] text-white shadow-md">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+          <img src="/logo.png" alt="Logo" className="w-9 h-9" />
+          <span className="text-white">QraMg</span>
         </div>
-      </div>
 
-      {/* Mobile Dropdown */}
-      <div
-        className={`md:hidden bg-white/90 backdrop-blur-md border-t border-gray-100 shadow-inner overflow-hidden transition-all duration-500 ease-in-out ${
-          isMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="px-4 py-3 space-y-2">
-          {links.map((item) => (
-            <Link
-              key={item.name}
-              to={item.path}
-              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                location.pathname === item.path
-                  ? "bg-indigo-100 text-indigo-600"
-                  : "text-gray-700 hover:bg-indigo-50"
-              }`}
-            >
-              <item.icon className="w-5 h-5 mr-2" /> {item.name}
-            </Link>
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex space-x-8 font-medium">
+          {navLinks.map((link, index) => (
+            <div key={index} className="relative group">
+              <Link to={link.path} className="hover:text-cyan-400">
+                {link.name}
+              </Link>
+              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-cyan-400 transition-all group-hover:w-full"></span>
+            </div>
           ))}
+        </nav>
 
-          <hr className="my-2 border-gray-200" />
-
+        {/* Desktop Login/Logout */}
+        <div className="hidden md:block">
           {user ? (
             <button
               onClick={handleLogout}
-              className="flex w-full items-center text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-md font-medium transition-all"
+              className="px-5 py-2 rounded-full font-semibold text-white bg-red-500 hover:bg-red-600 transition-all duration-300 shadow-md"
             >
-              <FiLogOut className="w-5 h-5 mr-2" /> Logout
+              Logout ({user.username})
             </button>
           ) : (
-            <Link
-              to="/auth/login"
-              className="flex items-center text-green-600 bg-green-50 hover:bg-green-100 px-3 py-2 rounded-md font-medium transition-all"
+            <button
+              onClick={handleLogin}
+              className="px-5 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-blue-500 hover:to-cyan-400 transition-all duration-300 shadow-md"
             >
-              <FiLogIn className="w-5 h-5 mr-2" /> Login / Signup
-            </Link>
+              Signup / Login
+            </button>
           )}
         </div>
+
+        {/* Hamburger */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsMobileOpen(!isMobileOpen)}
+            className="focus:outline-none relative w-6 h-6"
+          >
+            <span
+              className={`block absolute h-0.5 w-6 bg-white transform transition duration-300 ease-in-out ${
+                isMobileOpen ? "rotate-45 top-2.5" : "top-1"
+              }`}
+            ></span>
+            <span
+              className={`block absolute h-0.5 w-6 bg-white transition-all duration-300 ease-in-out ${
+                isMobileOpen ? "opacity-0" : "top-3"
+              }`}
+            ></span>
+            <span
+              className={`block absolute h-0.5 w-6 bg-white transform transition duration-300 ease-in-out ${
+                isMobileOpen ? "-rotate-45 top-2.5" : "top-5"
+              }`}
+            ></span>
+          </button>
+        </div>
       </div>
-    </nav>
+
+      {/* Mobile Menu */}
+      {isMobileOpen && (
+        <div className="md:hidden bg-[#0f0c29] px-6 pb-6 overflow-hidden">
+          <nav className="flex flex-col gap-4 py-4">
+            {navLinks.map((link, index) => (
+              <div key={index}>
+                <Link
+                  to={link.path}
+                  onClick={() => setIsMobileOpen(false)}
+                  className="text-white hover:text-cyan-400"
+                >
+                  {link.name}
+                </Link>
+              </div>
+            ))}
+
+            <div>
+              {user ? (
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-5 py-2 rounded-full font-semibold text-white bg-red-500 hover:bg-red-600 transition-all duration-300 shadow-md"
+                >
+                  Logout ({user.username})
+                </button>
+              ) : (
+                <button
+                  onClick={handleLogin}
+                  className="w-full px-5 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-blue-500 hover:to-cyan-400 transition-all duration-300 shadow-md"
+                >
+                  Signup / Login
+                </button>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 };
 

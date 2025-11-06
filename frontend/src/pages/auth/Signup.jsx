@@ -1,44 +1,43 @@
-import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "../navbar/navbar";
-import { AuthContext } from "../../module/content/AuthContext";
+import { apiPost } from "../../utils/api";
 
 function Signup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const { user, setUser } = useContext(AuthContext);
-  // const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/signup/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, role, email }),
+      const data = await apiPost("/api/signup/", {
+        username,
+        password,
+        role,
+        email,
       });
-      const data = await res.json();
+
       alert(data.message || data.error);
-    } catch (error) {
+    } catch (err) {
+      console.error(err);
       alert("Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-
-
   return (
     <>
       <Navbar />
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a002b] via-[#11004a] to-[#1a003b] relative overflow-hidden">
-        {/* Glowing orbs background */}
-        <div className="absolute top-[-10rem] left-[-10rem] w-[400px] h-[400px] bg-blue-700/30 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10rem] right-[-10rem] w-[400px] h-[400px] bg-purple-700/30 rounded-full blur-[120px]"></div>
+        {/* Glowing background */}
+        <div className="absolute top-[-10rem] left-[-10rem] w-[400px] h-[400px] bg-blue-700/30 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10rem] right-[-10rem] w-[400px] h-[400px] bg-purple-700/30 rounded-full blur-[120px]" />
 
         <div className="relative z-10 w-full max-w-md px-8 py-10 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/10 shadow-[0_0_40px_rgba(99,102,241,0.2)]">
           <h2 className="text-3xl font-bold text-center text-white mb-8 tracking-wide">
@@ -52,7 +51,6 @@ function Signup() {
               placeholder="Username"
               className="px-4 py-3 rounded-xl bg-white/10 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             />
-
             <input
               type="email"
               value={email}
@@ -75,7 +73,6 @@ function Signup() {
               required
             >
               <option value="">Select Role</option>
-              {/* <option value="superadmin">Superadmin</option> */}
               <option value="owner">Restaurant Owner</option>
               <option value="staff">Kitchen Staff</option>
               <option value="customer">Customer</option>
@@ -84,8 +81,9 @@ function Signup() {
             <button
               type="submit"
               disabled={loading}
-              className={`mt-4 py-3 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-[0_0_20px_rgba(147,51,234,0.6)] transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"
-                }`}
+              className={`mt-4 py-3 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-[0_0_20px_rgba(147,51,234,0.6)] transition-all duration-300 ${
+                loading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"
+              }`}
             >
               {loading ? "Signing up..." : "Sign Up"}
             </button>
@@ -99,10 +97,6 @@ function Signup() {
           </p>
         </div>
       </div>
-
-      <span className="text-sm text-gray-500">
-        {user ? window.location = '' : "Not logged in"}
-      </span>
     </>
   );
 }
