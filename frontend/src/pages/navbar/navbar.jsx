@@ -19,7 +19,7 @@ const navItems = {
     { name: "Orders", path: "/restaurant/orders" },
     { name: "Reports", path: "/restaurant/reports" },
     { name: "Settings", path: "/restaurant/settings" },
-    { name: "Term & cuddition", path: "/restaurant/term-coddintion" },
+    { name: "Terms & Conditions", path: "/restaurant/terms-conditions" },
   ],
   staff: [
     { name: "Kitchen Dashboard", path: "/staff/kitchen" },
@@ -28,7 +28,7 @@ const navItems = {
   tour_user: [
     { name: "Home", path: "/" },
     { name: "About", path: "/tour_about" },
-    { name: "Support", path: "/Support" },
+    { name: "Support", path: "/support" },
   ],
 };
 
@@ -66,106 +66,127 @@ const Navbar = () => {
   const navLinks = navItems[role] || [];
 
   return (
-    <header className="fixed top-0 w-full z-50 backdrop-blur-md bg-gradient-to-r from-[#0f0c29] via-[#302b63] to-[#24243e] text-white shadow-md">
+    <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-gradient-to-r from-[#F9FAFB]/90 via-white/90 to-[#EFF6FF]/90 shadow-lg transition-all duration-300">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+        <div
+          className="flex items-center gap-2 text-2xl font-extrabold cursor-pointer"
+          onClick={() => navigate("/")}
+        >
           <img src="/logo.png" alt="Logo" className="w-9 h-9" />
-          <span className="text-white">QraMg</span>
+          <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            QraMg
+          </span>
         </div>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex space-x-8 font-medium">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex space-x-8 text-gray-700 font-medium">
           {navLinks.map((link, index) => (
             <div key={index} className="relative group">
-              <Link to={link.path} className="hover:text-cyan-400">
+              <Link
+                to={link.path}
+                className="hover:text-cyan-500 transition-colors duration-200"
+              >
                 {link.name}
               </Link>
-              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-cyan-400 transition-all group-hover:w-full"></span>
+              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full"></span>
             </div>
           ))}
         </nav>
 
-        {/* Desktop Login/Logout */}
+        {/* Desktop Buttons */}
         <div className="hidden md:block">
           {user ? (
             <button
               onClick={handleLogout}
-              className="px-5 py-2 rounded-full font-semibold text-white bg-red-500 hover:bg-red-600 transition-all duration-300 shadow-md"
+              className="px-5 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-rose-600 hover:scale-105 transition-transform duration-300 shadow-md"
             >
               Logout ({user.username})
             </button>
           ) : (
             <button
               onClick={handleLogin}
-              className="px-5 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-blue-500 hover:to-cyan-400 transition-all duration-300 shadow-md"
+              className="px-5 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-blue-500 hover:to-cyan-400 hover:scale-105 transition-transform duration-300 shadow-md"
             >
               Signup / Login
             </button>
           )}
         </div>
 
-        {/* Hamburger */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="focus:outline-none relative w-6 h-6"
-          >
-            <span
-              className={`block absolute h-0.5 w-6 bg-white transform transition duration-300 ease-in-out ${
-                isMobileOpen ? "rotate-45 top-2.5" : "top-1"
-              }`}
-            ></span>
-            <span
-              className={`block absolute h-0.5 w-6 bg-white transition-all duration-300 ease-in-out ${
-                isMobileOpen ? "opacity-0" : "top-3"
-              }`}
-            ></span>
-            <span
-              className={`block absolute h-0.5 w-6 bg-white transform transition duration-300 ease-in-out ${
-                isMobileOpen ? "-rotate-45 top-2.5" : "top-5"
-              }`}
-            ></span>
-          </button>
-        </div>
+        {/* Mobile Hamburger */}
+        <button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="md:hidden flex flex-col justify-between w-6 h-5 focus:outline-none relative"
+        >
+          <span
+            className={`block h-0.5 bg-gray-800 transform transition-all duration-300 ${
+              isMobileOpen ? "rotate-45 translate-y-2" : ""
+            }`}
+          ></span>
+          <span
+            className={`block h-0.5 bg-gray-800 transition-all duration-300 ${
+              isMobileOpen ? "opacity-0" : ""
+            }`}
+          ></span>
+          <span
+            className={`block h-0.5 bg-gray-800 transform transition-all duration-300 ${
+              isMobileOpen ? "-rotate-45 -translate-y-2" : ""
+            }`}
+          ></span>
+        </button>
       </div>
 
-      {/* Mobile Menu */}
-      {isMobileOpen && (
-        <div className="md:hidden bg-[#0f0c29] px-6 pb-6 overflow-hidden">
-          <nav className="flex flex-col gap-4 py-4">
-            {navLinks.map((link, index) => (
-              <div key={index}>
-                <Link
-                  to={link.path}
-                  onClick={() => setIsMobileOpen(false)}
-                  className="text-white hover:text-cyan-400"
-                >
-                  {link.name}
-                </Link>
-              </div>
-            ))}
+      {/* Mobile Menu with staggered reveal animation */}
+      <div
+        className={`md:hidden backdrop-blur-xl bg-gradient-to-r from-[#F9FAFB]/95 via-white/95 to-[#EFF6FF]/95 border-t border-gray-200 transform transition-all duration-500 ease-[cubic-bezier(0.77,0,0.175,1)] origin-top ${
+          isMobileOpen
+            ? "max-h-96 opacity-100 scale-y-100"
+            : "max-h-0 opacity-0 scale-y-0"
+        }`}
+      >
+        <div className="px-6 py-4 flex flex-col gap-4 text-gray-700 font-medium">
+          {navLinks.map((link, index) => (
+            <Link
+              key={index}
+              to={link.path}
+              onClick={() => setIsMobileOpen(false)}
+              className={`hover:text-cyan-500 transition-all duration-300 transform ${
+                isMobileOpen
+                  ? `opacity-100 translate-y-0 delay-[${index * 80}ms]`
+                  : "opacity-0 -translate-y-2"
+              }`}
+              style={{
+                transitionDelay: isMobileOpen ? `${index * 80}ms` : "0ms",
+              }}
+            >
+              {link.name}
+            </Link>
+          ))}
 
-            <div>
-              {user ? (
-                <button
-                  onClick={handleLogout}
-                  className="w-full px-5 py-2 rounded-full font-semibold text-white bg-red-500 hover:bg-red-600 transition-all duration-300 shadow-md"
-                >
-                  Logout ({user.username})
-                </button>
-              ) : (
-                <button
-                  onClick={handleLogin}
-                  className="w-full px-5 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-blue-500 hover:to-cyan-400 transition-all duration-300 shadow-md"
-                >
-                  Signup / Login
-                </button>
-              )}
-            </div>
-          </nav>
+          <div
+            className={`pt-3 transform transition-all duration-500 ${
+              isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+            }`}
+            style={{ transitionDelay: `${navLinks.length * 80}ms` }}
+          >
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="w-full px-5 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-rose-600 hover:scale-105 transition-transform duration-300 shadow-md"
+              >
+                Logout ({user.username})
+              </button>
+            ) : (
+              <button
+                onClick={handleLogin}
+                className="w-full px-5 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-400 to-blue-500 hover:scale-105 transition-transform duration-300 shadow-md"
+              >
+                Signup / Login
+              </button>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </header>
   );
 };
