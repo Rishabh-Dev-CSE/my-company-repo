@@ -4,13 +4,17 @@ import HomeRoute from "./pages/home/HomeRoute";
 import AboutRoute from "./pages/about/AboutRoute";
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
+import Sidebar from "./components/dashboard/Sidebar";
+import DashboardRoute from "./components/dashboard/DashboardRoute";
 
 
 const AppRoute = () => {
 
     function PrivateRoute({ children }) {
         const token = localStorage.getItem("access");
-        alert('user login is required!')
+        if (!token){
+            alert('user login is required!')
+        }
         return token ? children : <Navigate to="/auth/login" />;
     }
 
@@ -23,6 +27,7 @@ const AppRoute = () => {
                 {/* auth urls */}
                 <Route path="/auth/signup" element={<Signup />} />
                 <Route path="/auth/login" element={<Login/>} />
+                <Route path="/restaurant/dashboard" element={<DashboardRoute />} />
                 {/* <Route path="/admin/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} /> */}
             </Routes>
         </BrowserRouter>

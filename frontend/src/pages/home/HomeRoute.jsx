@@ -6,6 +6,8 @@ import HowItWorksSection from "./HowItWorksSection";
 import TestimonialsSection from "./TestimonialsSection";
 import FAQSection from "./FAQSection";
 import Footer from "../footer/Footer";
+import WhyUseSimple from "./WhyUseSimple";
+// import VideoCarousel from "./VideoCarousel";
 
 
 const HomeRoute = () => {
@@ -14,8 +16,9 @@ const HomeRoute = () => {
             <Navbar/>
             <HomeHeroSection />
             <FeaturesSection />
+            <WhyUseSimple />
             <HowItWorksSection />
-            <TestimonialsSection />
+            {/* <VideoCarousel /> */}
             <FAQSection />
             <Footer />
         </>
