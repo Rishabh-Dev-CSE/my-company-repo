@@ -6,6 +6,7 @@ import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import Sidebar from "./components/dashboard/Sidebar";
 import DashboardRoute from "./components/dashboard/DashboardRoute";
+import AdminPanelRoute from "./admin_dashbord/panel_design/AdminPanelRoute";
 
 
 const AppRoute = () => {
@@ -28,7 +29,10 @@ const AppRoute = () => {
                 <Route path="/auth/signup" element={<Signup />} />
                 <Route path="/auth/login" element={<Login/>} />
                 <Route path="/restaurant/dashboard" element={<DashboardRoute />} />
-                {/* <Route path="/admin/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} /> */}
+
+
+                {/* ===============Admin Panel Routes ============ */}
+                <Route path="/admin" element={<AdminPanelRoute />} /> 
             </Routes>
         </BrowserRouter>
     );

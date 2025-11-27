@@ -50,9 +50,12 @@ const Navbar = () => {
     setIsMobileOpen(false);
   }, [location]);
 
+
+  const BASE_URL = 'http://127.0.0.1:8000'
+  
   const handleLogout = async () => {
     try {
-      await fetch("http://127.0.0.1:8000/api/logout/", { method: "POST" });
+      await fetch(`${BASE_URL}/api/logout`, { method: "POST" });
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
       navigate("/auth/login");
@@ -61,9 +64,12 @@ const Navbar = () => {
     }
   };
 
+
   const handleLogin = () => navigate("/auth/login");
   const role = user?.role?.toLowerCase() || "tour_user";
   const navLinks = navItems[role] || [];
+
+
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-gradient-to-r from-[#F9FAFB]/90 via-white/90 to-[#EFF6FF]/90 shadow-lg transition-all duration-300">
@@ -119,30 +125,26 @@ const Navbar = () => {
           className="md:hidden flex flex-col justify-between w-6 h-5 focus:outline-none relative"
         >
           <span
-            className={`block h-0.5 bg-gray-800 transform transition-all duration-300 ${
-              isMobileOpen ? "rotate-45 translate-y-2" : ""
-            }`}
+            className={`block h-0.5 bg-gray-800 transform transition-all duration-300 ${isMobileOpen ? "rotate-45 translate-y-2" : ""
+              }`}
           ></span>
           <span
-            className={`block h-0.5 bg-gray-800 transition-all duration-300 ${
-              isMobileOpen ? "opacity-0" : ""
-            }`}
+            className={`block h-0.5 bg-gray-800 transition-all duration-300 ${isMobileOpen ? "opacity-0" : ""
+              }`}
           ></span>
           <span
-            className={`block h-0.5 bg-gray-800 transform transition-all duration-300 ${
-              isMobileOpen ? "-rotate-45 -translate-y-2" : ""
-            }`}
+            className={`block h-0.5 bg-gray-800 transform transition-all duration-300 ${isMobileOpen ? "-rotate-45 -translate-y-2" : ""
+              }`}
           ></span>
         </button>
       </div>
 
       {/* Mobile Menu with staggered reveal animation */}
       <div
-        className={`md:hidden backdrop-blur-xl bg-gradient-to-r from-[#F9FAFB]/95 via-white/95 to-[#EFF6FF]/95 border-t border-gray-200 transform transition-all duration-500 ease-[cubic-bezier(0.77,0,0.175,1)] origin-top ${
-          isMobileOpen
-            ? "max-h-96 opacity-100 scale-y-100"
-            : "max-h-0 opacity-0 scale-y-0"
-        }`}
+        className={`md:hidden backdrop-blur-xl bg-gradient-to-r from-[#F9FAFB]/95 via-white/95 to-[#EFF6FF]/95 border-t border-gray-200 transform transition-all duration-500 ease-[cubic-bezier(0.77,0,0.175,1)] origin-top ${isMobileOpen
+          ? "max-h-96 opacity-100 scale-y-100"
+          : "max-h-0 opacity-0 scale-y-0"
+          }`}
       >
         <div className="px-6 py-4 flex flex-col gap-4 text-gray-700 font-medium">
           {navLinks.map((link, index) => (
@@ -150,11 +152,10 @@ const Navbar = () => {
               key={index}
               to={link.path}
               onClick={() => setIsMobileOpen(false)}
-              className={`hover:text-cyan-500 transition-all duration-300 transform ${
-                isMobileOpen
-                  ? `opacity-100 translate-y-0 delay-[${index * 80}ms]`
-                  : "opacity-0 -translate-y-2"
-              }`}
+              className={`hover:text-cyan-500 transition-all duration-300 transform ${isMobileOpen
+                ? `opacity-100 translate-y-0 delay-[${index * 80}ms]`
+                : "opacity-0 -translate-y-2"
+                }`}
               style={{
                 transitionDelay: isMobileOpen ? `${index * 80}ms` : "0ms",
               }}
@@ -164,9 +165,8 @@ const Navbar = () => {
           ))}
 
           <div
-            className={`pt-3 transform transition-all duration-500 ${
-              isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
-            }`}
+            className={`pt-3 transform transition-all duration-500 ${isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+              }`}
             style={{ transitionDelay: `${navLinks.length * 80}ms` }}
           >
             {user ? (

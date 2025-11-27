@@ -1,5 +1,5 @@
 import React from "react";
-import { useUserCustome} from "../../components/hooks/testhooks/useApi";
+import { useUserCustome} from "../../hooks/testhooks/useApi";
 const Showdata = () => {
         const {data, error, loading} = useUserCustome('https://jsonplaceholder.typicode.com/posts')
 

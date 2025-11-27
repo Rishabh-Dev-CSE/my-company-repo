@@ -3,10 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../navbar/navbar";
 import { AuthContext } from "../../module/content/AuthContext";
 
+
+const BASE_URL = 'http://127.0.0.1:8000'
+
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState(""); // 👈 added
+  const [role, setRole] = useState(""); 
   const [loading, setLoading] = useState(false);
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -22,7 +25,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/login/", {
+      const res = await fetch(`${BASE_URL}/api/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, role }),
@@ -48,11 +51,11 @@ function Login() {
         // Redirect based on role
         switch (role.toLowerCase()) {
           case "admin":
-            navigate("/admin/dashboard");
+            navigate("/admin");
             break;
           case "owner":
           case "restaurant owner":
-            navigate("/restaurant/dashboard");
+            navigate("/admin");
             break;
           case "staff":
           case "kitchen staff":
@@ -104,7 +107,7 @@ function Login() {
               required
             />
 
-            {/* 👇 Role Dropdown */}
+            {/*  Role Dropdown */}
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}

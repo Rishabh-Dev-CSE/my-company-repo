@@ -1,8 +1,9 @@
+const BASE_URL = 'http://127.0.0.1:8000'
 export async function apiGet(url) {
   const token = localStorage.getItem("access");
   if (!token) throw new Error("No token found");
 
-  let res = await fetch(`http://127.0.0.1:8000${url}`, {
+  let res = await fetch(`${BASE_URL}${url}`, {
     headers: {
       "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -13,7 +14,7 @@ export async function apiGet(url) {
   if (res.status === 401) {
   const refresh = localStorage.getItem("refresh");
   if (refresh) {
-    const refreshRes = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+    const refreshRes = await fetch(`${BASE_URL}/api/token/refresh/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh }),
@@ -43,7 +44,7 @@ export async function apiPost(url, data) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  let res = await fetch(`http://127.0.0.1:8000${url}`, {
+  let res = await fetch(`${BASE_URL}${url}`, {
     method: "POST",
     headers,
     body: JSON.stringify(data),
@@ -53,7 +54,7 @@ export async function apiPost(url, data) {
   if (res.status === 401) {
     const refresh = localStorage.getItem("refresh");
     if (refresh) {
-      const refreshRes = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+      const refreshRes = await fetch(`${BASE_URL}/api/token/refresh/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh }),
@@ -74,3 +75,4 @@ export async function apiPost(url, data) {
 
   return res.json();
 }
+

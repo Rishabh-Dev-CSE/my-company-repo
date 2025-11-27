@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../navbar/navbar";
 import { apiPost } from "../../utils/api";
+import SuccessModal from "../../module/cards/SuccessModal";
 
 function Signup() {
   const [username, setUsername] = useState("");
@@ -9,6 +10,9 @@ function Signup() {
   const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [successOpen, setSuccessOpen] = useState(false)
+  const [successMsg, setSuccessMsg] = useState('')
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -22,7 +26,16 @@ function Signup() {
         email,
       });
 
-      alert(data.message || data.error);
+      setSuccessMsg(data.message);
+      setSuccessOpen(true); 
+
+      setUsername("");
+      setPassword("");
+      setRole("");
+      setEmail("");
+
+
+
     } catch (err) {
       console.error(err);
       alert("Signup failed. Please try again.");
@@ -81,9 +94,8 @@ function Signup() {
             <button
               type="submit"
               disabled={loading}
-              className={`mt-4 py-3 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-[0_0_20px_rgba(147,51,234,0.6)] transition-all duration-300 ${
-                loading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"
-              }`}
+              className={`mt-4 py-3 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-[0_0_20px_rgba(147,51,234,0.6)] transition-all duration-300 ${loading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"
+                }`}
             >
               {loading ? "Signing up..." : "Sign Up"}
             </button>
@@ -95,6 +107,13 @@ function Signup() {
               Login
             </Link>
           </p>
+
+          <SuccessModal 
+              open={successOpen}
+              message={successMsg}
+              buttonText={'Okay'}
+              onClose={() => setSuccessOpen(false)}
+          />
         </div>
       </div>
     </>
