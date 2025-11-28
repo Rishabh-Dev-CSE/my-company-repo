@@ -13,7 +13,7 @@ const AppRoute = () => {
 
     function PrivateRoute({ children }) {
         const token = localStorage.getItem("access");
-        if (!token){
+        if (!token) {
             alert('user login is required!')
         }
         return token ? children : <Navigate to="/auth/login" />;
@@ -24,15 +24,19 @@ const AppRoute = () => {
             <Routes>
                 <Route path="/" element={<HomeRoute />} />
                 {/* <Route path="/about" element={<AboutRoute />} />  */}
-                <Route path="/about" element={<PrivateRoute><AboutRoute /></PrivateRoute>} /> 
+                <Route path="/about" element={<PrivateRoute><AboutRoute /></PrivateRoute>} />
                 {/* auth urls */}
                 <Route path="/auth/signup" element={<Signup />} />
-                <Route path="/auth/login" element={<Login/>} />
+                <Route path="/auth/login" element={<Login />} />
                 <Route path="/restaurant/dashboard" element={<DashboardRoute />} />
 
 
                 {/* ===============Admin Panel Routes ============ */}
-                <Route path="/admin" element={<AdminPanelRoute />} /> 
+                <Route path="/admin" element={<AdminPanelRoute />} />
+                <Route path="/admin/controls" element={<AdminPanelRoute />} />
+                <Route path="/admin/users" element={<AdminPanelRoute />} />
+                <Route path="/admin/settings" element={<AdminPanelRoute />} />
+
             </Routes>
         </BrowserRouter>
     );

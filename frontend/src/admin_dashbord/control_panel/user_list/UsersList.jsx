@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { apiGet, apiDelete } from "../../../utils/api";
+import { apiGet, apiDelete, apiPost, apiUpdate } from "../../../utils/api";
 import SuccessModal from "../../../module/cards/SuccessModal";
 import ErrorModal from "../../../module/cards/ErrorModel";
+import UpdateUserModal from "../../../module/cards/UpdateUserModal";
 
 function UserList() {
     const [users, setUsers] = useState([]);
@@ -13,13 +14,17 @@ function UserList() {
     const [errorOpen, setErrorOpen] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
 
+    // Update User Modal
+    const [updateOpen, setUpdateOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [updateLoading, setUpdateLoading] = useState(false);
+
     useEffect(() => {
         apiGet("/api/user/list/")
             .then((res) => {
                 setUsers(res.data || []);
             })
             .catch((err) => {
-                console.error(err);
                 setError("Failed to fetch data");
             });
     }, []);
@@ -27,18 +32,49 @@ function UserList() {
     const handleDelete = async (id) => {
         try {
             const res = await apiDelete(`/api/user/delete/${id}/`);
-
-            // Only remove row if backend returns success
             setUsers((prev) => prev.filter((u) => u.id !== id));
-
             setSuccessMsg(res.message);
             setSuccessOpen(true);
+        } catch (err) {
+            setErrorMsg(err.message || "Unexpected error");
+            setErrorOpen(true);
+        }
+    };
+
+    // Open update modal with user data
+    const handleOpenUpdate = (user) => {
+        setSelectedUser(user);
+        setUpdateOpen(true);
+    };
+
+    // Update user
+    const handleUpdateUser = async (formData) => {
+        if (!selectedUser) return;
+
+        setUpdateLoading(true);
+
+        try {
+            const data = await apiUpdate(`/api/user/update/${selectedUser.id}/`, formData);
+
+            // Update frontend list also
+            setUsers((prev) =>
+                prev.map((u) =>
+                    u.id === selectedUser.id ? { ...u, ...formData } : u
+                )
+            );
+
+            setSuccessMsg(data.message || "User updated successfully");
+            setSuccessOpen(true);
+            setUpdateOpen(false);
 
         } catch (err) {
-            console.error("Delete error:", err);
 
-            setErrorMsg(err.message || "Unexpected error occurred");
+            setUpdateOpen(false);
+            setErrorMsg(err.message || "Update failed");
             setErrorOpen(true);
+
+        } finally {
+            setUpdateLoading(false);
         }
     };
 
@@ -46,13 +82,7 @@ function UserList() {
         <div className="min-h-screen bg-gray-100 p-6">
             <h1 className="text-2xl font-bold mb-6">User List</h1>
 
-            {error && (
-                <div className="bg-red-200 text-red-700 px-4 py-2 rounded mb-4">
-                    {error}
-                </div>
-            )}
-
-            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+            <div className="bg-white shadow-md rounded-lg overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-gray-200 text-gray-700">
@@ -71,20 +101,18 @@ function UserList() {
                                     <td className="py-2 px-4 border">{user.id}</td>
                                     <td className="py-2 px-4 border">{user.username}</td>
                                     <td className="py-2 px-4 border">{user.email}</td>
-                                    <td className="py-2 px-4 border capitalize">{user.role}</td>
+                                    <td className="py-2 px-4 border">{user.role}</td>
 
                                     <td className="py-2 px-4 border text-center space-x-2">
                                         <button
-                                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                                            onClick={() =>
-                                                (window.location.href = `https://localhost:8000/update/id=${user.id}`)
-                                            }
+                                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                            onClick={() => handleOpenUpdate(user)}
                                         >
-                                            update
+                                            Update
                                         </button>
 
                                         <button
-                                            className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700"
+                                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                                             onClick={() => handleDelete(user.id)}
                                         >
                                             Delete
@@ -94,9 +122,7 @@ function UserList() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className="text-center py-4 text-gray-500">
-                                    No users found
-                                </td>
+                                <td colSpan="5" className="text-center py-4 text-gray-500">No users found</td>
                             </tr>
                         )}
                     </tbody>
@@ -115,6 +141,15 @@ function UserList() {
                 message={errorMsg}
                 buttonText="Okay"
                 onClose={() => setErrorOpen(false)}
+            />
+
+            {/* Update Modal */}
+            <UpdateUserModal
+                open={updateOpen}
+                userData={selectedUser || {}}
+                loading={updateLoading}
+                onClose={() => setUpdateOpen(false)}
+                onSubmit={handleUpdateUser}
             />
         </div>
     );

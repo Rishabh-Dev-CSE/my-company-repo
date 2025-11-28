@@ -1,7 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 
-function ErrorModal({ open, message, buttonText, onClose }) {
+function ErrorModal({ open, message, buttonText, onClose,headingMessage }) {
   return (
     <div
       className={`
@@ -23,7 +23,7 @@ function ErrorModal({ open, message, buttonText, onClose }) {
           <X className="text-red-500" size={32} />
         </div>
 
-        <h2 className="text-white text-xl font-semibold mb-2">Failed (Error)</h2>
+        <h2 className="text-white text-xl font-semibold mb-2">{headingMessage || "Failed (Error)" }</h2>
 
         <p className="text-gray-400 text-sm mb-6">{message}</p>
 

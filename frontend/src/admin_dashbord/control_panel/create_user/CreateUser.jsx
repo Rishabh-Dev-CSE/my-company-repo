@@ -2,19 +2,21 @@ import { useState } from "react";
 import { apiPost } from "../../../utils/api";
 import SuccessModal from "../../../module/cards/SuccessModal";
 import ErrorModal from "../../../module/cards/ErrorModel";
+import { useNavigate, useLocation } from "react-router-dom";
 
-function Signup() {
+function CreateUser() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("");
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const [successOpen, setSuccessOpen] = useState(false);
-    const [successMsg, setSuccessMsg] = useState("");
 
     const [errorOpen, setErrorOpen] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
+
+    const [successOpen, setSuccessOpen] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -27,9 +29,14 @@ function Signup() {
                 role,
                 email,
             });
-
-            setSuccessMsg(data.message);
-            setSuccessOpen(true);
+            if (data.message) {
+                setSuccessMsg(data.message);
+                setSuccessOpen(true);
+            }
+            if (data.error) {
+                setErrorMsg(data.error);
+                setErrorOpen(true);
+            }
 
             // Reset fields
             setUsername("");
@@ -46,9 +53,6 @@ function Signup() {
                 err?.message ||
                 "Something went wrong";
 
-            setErrorMsg(extractedError);
-            setErrorOpen(true);
-
         } finally {
             setLoading(false);
         }
@@ -56,22 +60,6 @@ function Signup() {
 
     return (
         <div className="flex items-center bg-gray-100">
-
-            {/* Success Modal */}
-            <SuccessModal
-                open={successOpen}
-                message={successMsg}
-                buttonText="Go back to dashboard"
-                onClose={() => setSuccessOpen(false)}
-            />
-
-            {/* Error Modal */}
-            <ErrorModal
-                open={errorOpen}
-                message={errorMsg}
-                buttonText="Okay"
-                onClose={() => setErrorOpen(false)}
-            />
 
             {/* Signup Card */}
             <div className="w-full max-w-md px-10 py-10 bg-white rounded-xl border border-gray-300 shadow-md">
@@ -145,8 +133,25 @@ function Signup() {
             </div>
 
             <div className="rounded-xl border border-gray-300 ms-10 w-full h-[50vh] shadow-md"></div>
+
+            {/* Success Modal */}
+            <SuccessModal
+                open={successOpen}
+                message={successMsg}
+                buttonText="Go back to dashboard"
+                onClose={() => setSuccessOpen(false)}
+            />
+
+            {/* Error Modal */}
+            <ErrorModal
+                open={errorOpen}
+                message={errorMsg}
+                headingMessage = 'Faild to create user !'
+                buttonText="Okay"
+                onClose={() => setErrorOpen(false)}
+            />
         </div>
     );
 }
 
-export default Signup;
+export default CreateUser;

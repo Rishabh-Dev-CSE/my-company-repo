@@ -69,9 +69,9 @@ def signup(request):
     if role == "owner":
         try:
             if User.objects.filter(username=username).exists():
-                return Response({"message":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
             if User.objects.filter(email=email).exists():
-                return Response({"message":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
 
             user = User.objects.create_user(username=username,password=password, email=email, role=role)
             user.save()
@@ -97,9 +97,9 @@ def signup(request):
                     return Response({'error':'create your restaurant (get id) after that you can add staff member'}, status=status.HTTP_404_NOT_FOUND)
                 
                 if User.objects.filter(username=username).exists():
-                    return Response({"message":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"error":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
                 if User.objects.filter(email=email).exists():
-                    return Response({"message":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"error":"user already exist"}, status=status.HTTP_400_BAD_REQUEST)
                 
                 user_as_staff = User.objects.create_user(username=username,password=password, email=email, role=role)
                 user_as_staff.save()
@@ -158,7 +158,7 @@ def logout_view(request):
 def getUserList(request):
 
     # Only admin role allowed
-    if request.user.role != 'owner':
+    if request.user.role != 'admin':
         return Response(
             {"error": "You do not have permission to access this resource."},
             status=status.HTTP_403_FORBIDDEN
@@ -174,7 +174,7 @@ def getUserList(request):
 @permission_classes([IsAuthenticated])
 def remove_user(request, id):
     if request.user.role != 'admin':
-        return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"error": "Permission denied (login admin account)"}, status=status.HTTP_403_FORBIDDEN)
     try:
         user = User.objects.get(id=id)
         d = user.delete()
@@ -185,3 +185,74 @@ def remove_user(request, id):
 
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_user(request, id):
+    # Only admin can update users
+    if request.user.role != 'admin':
+        return Response(
+            {'error': 'Permission denied'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    # Try fetching user by ID
+    try:
+        user = User.objects.get(id=id)
+    except User.DoesNotExist:
+        return Response(
+            {'error': 'User not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Extract incoming update data
+    username = request.data.get("username")
+    email = request.data.get("email")
+    role = request.data.get("role")
+
+    # Basic validation
+    if not username:
+        return Response({'error': 'Username is required'}, status=400)
+
+    if not email:
+        return Response({'error': 'Email is required'}, status=400)
+
+    if not role:
+        return Response({'error': 'Role is required'}, status=400)
+
+    # Check duplicate email (optional)
+    if User.objects.exclude(id=id).filter(email=email).exists():
+        return Response(
+            {'error': 'Email already exists'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Check duplicate username
+    if User.objects.exclude(id=id).filter(username=username).exists():
+        return Response(
+            {'error': 'Username already exists'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Apply updates
+    user.username = username
+    user.email = email
+    user.role = role
+    user.save()
+
+    # Success Response
+    return Response(
+        {
+            'message': 'User updated successfully',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': user.role,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
