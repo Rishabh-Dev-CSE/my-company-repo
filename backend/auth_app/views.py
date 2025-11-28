@@ -144,11 +144,44 @@ def refresh_token_view(request):
     except Exception:
         return Response({'error': 'Invalid refresh token'}, status=401)
 
-
-# ✅ Logout
+# Logout
 @api_view(['POST'])
 def logout_view(request):
     response = Response({'message': 'Logged out'}, status=200)
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
     return response
+
+# =======Get User List ===============
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getUserList(request):
+
+    # Only admin role allowed
+    if request.user.role != 'owner':
+        return Response(
+            {"error": "You do not have permission to access this resource."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    users = User.objects.all().values("id", "username", "email", "role", "date_joined")
+
+    return Response({"data": list(users)}, status=status.HTTP_200_OK)
+
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_user(request, id):
+    if request.user.role != 'admin':
+        return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+    try:
+        user = User.objects.get(id=id)
+        d = user.delete()
+        if d[0] == 1:
+            return Response({"message": "User deleted"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Delete failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
