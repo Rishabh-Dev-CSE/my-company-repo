@@ -9,4 +9,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('token/refresh/', views.refresh_token_view, name='refresh'),
     path('user/', views.getUserData),
+    path('user/list/', views.getUserList),
+    path('user/delete/<int:id>/', views.remove_user),
 ]
