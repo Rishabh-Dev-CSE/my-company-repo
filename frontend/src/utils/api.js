@@ -12,23 +12,23 @@ export async function apiGet(url) {
 
   // If access token expired
   if (res.status === 401) {
-  const refresh = localStorage.getItem("refresh");
-  if (refresh) {
-    const refreshRes = await fetch(`${BASE_URL}/api/token/refresh/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh }),
-    });
-    const newData = await refreshRes.json();
-    if (newData.access) {
-      localStorage.setItem("access", newData.access);
-      return apiGet(url); // retry API call
+    const refresh = localStorage.getItem("refresh");
+    if (refresh) {
+      const refreshRes = await fetch(`${BASE_URL}/api/token/refresh/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh }),
+      });
+      const newData = await refreshRes.json();
+      if (newData.access) {
+        localStorage.setItem("access", newData.access);
+        return apiGet(url); // retry API call
+      }
     }
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    window.location.href = "/auth/login";
   }
-  localStorage.removeItem("access");
-  localStorage.removeItem("refresh");
-  window.location.href = "/auth/login";
-}
   return res.json();
 }
 
@@ -74,5 +74,50 @@ export async function apiPost(url, data) {
   }
 
   return res.json();
+}
+
+
+export async function apiDelete(url) {
+  const token = localStorage.getItem("access");
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+
+  let res = await fetch(`${BASE_URL}${url}`, {
+    method: "DELETE",
+    headers,
+  });
+
+  if (res.status === 401) {
+    const refresh = localStorage.getItem("refresh");
+
+    if (refresh) {
+      const refreshRes = await fetch(`${BASE_URL}/api/token/refresh/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh }),
+      });
+
+      const newData = await refreshRes.json();
+      if (newData.access) {
+        localStorage.setItem("access", newData.access);
+        return apiDelete(url);
+      }
+    }
+
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    window.location.href = "/auth/login";
+  }
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Delete failed");
+  }
+
+  return data;
 }
 
