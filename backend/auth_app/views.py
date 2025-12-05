@@ -187,7 +187,6 @@ def remove_user(request, id):
         return Response({"error": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
     
 
-
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_user(request, id):
