@@ -78,6 +78,9 @@ function UserList() {
         }
     };
 
+    const handleDetails = () => {
+         apiGet()
+    }
     return (
         <div className="min-h-screen bg-gray-100 p-6">
             <h1 className="text-2xl font-bold mb-6">User List</h1>
@@ -113,9 +116,20 @@ function UserList() {
 
                                         <button
                                             className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                                            onClick={() => handleDelete(user.id)}
+                                            onClick={() => {
+                                                if (confirm("Are you sure you want to delete this user?")) {
+                                                    handleDelete(user.id);
+                                                }
+                                            }}
+
                                         >
                                             Delete
+                                        </button>
+                                        <button
+                                            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                                            onClick={() => handleDetails(user.id)}
+                                        >
+                                            details
                                         </button>
                                     </td>
                                 </tr>
